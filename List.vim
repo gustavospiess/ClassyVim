@@ -27,7 +27,23 @@ function! ListPop() dict
     return temp.value
 endfunction
 
-let List = Class(Object, {'add': function('ListAdd'), 'push': function('ListPush'), 'pop': function('ListPop')}, ['_first', '_last'])
+function! ListEmpty() dict
+    return empty(self._first)
+endfunction
+
+function! ListFor(callBack) dict
+    let cur = self._first
+    while !empty(cur)
+        call a:callBack(cur.value)
+        let cur = cur.next
+    endwhile
+endfunction
+
+let List = Class(Object, {'add': function('ListAdd'),
+                            \'push': function('ListPush'),
+                            \'pop': function('ListPop'),
+                            \'isEmpty': function('ListEmpty'),
+                            \'forEach': function('ListFor')}, ['_first', '_last'])
 
 let l1 = List.create()
 call l1.add(1)
@@ -40,3 +56,7 @@ call l1.add(7)
 call l1.add(8)
 call l1.add(9)
 call l1.push(0)
+
+function! PrintIt(value)
+    echo a:value
+endfunction

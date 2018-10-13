@@ -1,10 +1,12 @@
-let AbstractMethodNotImplemented = 'Er001 - Abstract Method not implemented'
+let g:class = {}
+let g:class.abstractMethodNotImplemented = 'Er001 - Abstract Method not implemented'
+let g:class.abstractMethod = 'abstract'
 
 function! Create() dict
     let obj = {}
     for meth in keys(self._methods)
-        if self._methods[meth] == 'asbtract'
-            throw AbstractMethodNotImplemented
+        if self._methods[meth] == g:class.abstractMethod
+            throw g:class.abstractMethodNotImplemented
         endif
         let obj[meth] = self._methods[meth]
     endfor
