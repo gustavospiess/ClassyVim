@@ -1,7 +1,7 @@
 
 "-------------------------------------------------------------------------------
 
-let g:Object = {'_methods' : {}, '_fields': [], '_name' : 'Object', 'Create': function('Create')}
+let g:Object = {'_methods' : {}, '_fields': [], '_name' : 'Object', 'Create': function('Create'), 'Init': function('Init')}
 let g:Object._parents = [ g:Object ]
 
 let g:vimClass = {}
@@ -21,7 +21,7 @@ let g:vimClass.flgs.abstractMethod = 'abstract'
 
 "-------------------------------------------------------------------------------
 
-function! Create() dict
+function! Create(...) dict
     let obj = {}
     for meth in keys(self._methods)
         if self._methods[meth] == g:vimClass.flgs.abstractMethod
@@ -33,16 +33,24 @@ function! Create() dict
         let obj[fie] = 0
     endfor
     let obj.class = self
+    execute 'call obj.Init('.substitute(string(a:000), '\[\|\]', '', 'g').')'
     return obj
+endfunction
+
+function! Init(...) dict
+    for i in range(len(a:000))
+        let self[self.class._fields[i]] = a:000[i]
+    endfor
 endfunction
 
 function! VGenerateClass(name)
     let clazz = {}
-    let clazz['_methods'] = {}
-    let clazz['_fields'] = []
-    let clazz['_parents'] = []
-    let clazz['_name'] = a:name
-    let clazz['Create'] = function('Create')
+    let clazz._methods = {}
+    let clazz._methods.Init = function('Init')
+    let clazz._fields = []
+    let clazz._parents = []
+    let clazz._name = a:name
+    let clazz.Create = function('Create')
     return clazz
 endfunction
 
