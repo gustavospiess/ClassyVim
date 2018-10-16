@@ -1,35 +1,35 @@
 source Class.vim
 
-Class Collection
-    AbstractMethod ForEach
-    AbstractMethod IsEmpty
-    AbstractMethod Contains
+Class 'Collection'
+    AbstractMethod 'ForEach'
+    AbstractMethod 'IsEmpty'
+    AbstractMethod 'Contains'
 EndClass
 
-Class Stack
+Class 'Stack'
     Extends Collection
-    AbstractMethod Pop
-    AbstractMethod Push
+    AbstractMethod 'Pop'
+    AbstractMethod 'Push'
 EndClass
 
-Class Queue
+Class 'Queue'
     Extends Collection
-    AbstractMethod Add
-    AbstractMethod Pop
+    AbstractMethod 'Add'
+    AbstractMethod 'Pop'
 EndClass
 
-Class Set
+Class 'Set'
     Extends Collection
-    AbstractMethod Add
-    AbstractMethod Get
-    AbstractMethod Set
+    AbstractMethod 'Add'
+    AbstractMethod 'Get'
+    AbstractMethod 'Set'
 EndClass
 
 "-------------------------------------------------------------------------------
 
-Class Node
-    Field next
-    Field value
+Class 'Node'
+    Field 'next'
+    Field 'value'
 EndClass
 
 function! IsEmpty() dict
@@ -54,18 +54,21 @@ function! Contains(value) dict
     endwhile
 endfunction
 
-Class LinkedStructure
+Class 'LinkedStructure'
     Extends Collection
-    Method ForEach
-    Method IsEmpty
-    Method Contains
-    Field _last
-    Field _first
+    Method 'ForEach', function('ForEach')
+    Method 'IsEmpty', function('IsEmpty')
+    Method 'Contains', function('Contains')
+    Field '_first'
 EndClass
 
+Class 'LinkedStructureWhitLast'
+    Extends LinkedStructure
+    Field '_last'
+EndClass
 "---------------------------------------
 
-function! Add(value) dict
+function! LQAdd(value) dict
     if empty(self._first)
         let self._first = g:Node.Create()
         let self._first.value = a:value
@@ -83,11 +86,11 @@ function! Pop() dict
     return temp.value
 endfunction
 
-Class LinkedQueue
+Class 'LinkedQueue'
     Extends Queue
-    Extends LinkedStructure
-    Method Add
-    Method Pop
+    Extends LinkedStructureWhitLast
+    Method 'Add', function('LQAdd')
+    Method 'Pop', function('Pop')
 EndClass
 
 let qu1 = LinkedQueue.Create()
@@ -108,11 +111,11 @@ function! Push(value) dict
     let self._first = temp
 endfunction
 
-Class LinkedStack
+Class 'LinkedStack'
     Extends Stack
     Extends LinkedStructure
-    Method Push
-    Method Pop
+    Method 'Push', function('Push')
+    Method 'Pop', function('Pop')
 EndClass
 
 let st1 = LinkedStack.Create()
@@ -126,7 +129,7 @@ call st1.Push(3)
 
 "---------------------------------------
 
-function! Add(value) dict
+function! StAdd(value) dict
     if self.Contains(a:value)
         return 0
     endif
@@ -161,12 +164,12 @@ function! Set(index, value) dict
     let cur.value = a:value
 endfunction
 
-Class LinkedSet
+Class 'LinkedSet'
     Extends Set
-    Extends LinkedStructure
-    Method Add
-    Method Get
-    Method Set
+    Extends LinkedStructureWhitLast
+    Method 'Add', function('StAdd')
+    Method 'Get', function('Get')
+    Method 'Set', function('Set')
 EndClass
 
 let st = LinkedSet.Create()
@@ -180,7 +183,7 @@ call st.Add(5)
 
 "---------------------------------------
 
-function! Add(value) dict
+function! SQAdd(value) dict
     if empty(self._first)
         let self._first = g:Node.Create()
         let self._first.value = a:value
@@ -213,10 +216,10 @@ function! Add(value) dict
     endif
 endfunction
 
-Class SortedLinkedQueue
+Class 'SortedLinkedQueue'
     Extends LinkedQueue
-    Field comparator
-    Method Add
+    Field 'comparator'
+    Method 'Add', function('SQAdd')
 EndClass
 
 function! Compare(value1, value2)
@@ -249,4 +252,14 @@ call sq1.Add(9)
 call sq1.Add(10)
 call sq1.Add(11)
 call sq1.Add(3)
+call sq1.Super('Add', g:LinkedQueue)(0)
+call sq1.Super('Add', g:LinkedQueue)(14)
 
+
+call sq1.ForEach(function('Echo'))
+echo '---'
+call st.ForEach(function('Echo'))
+echo '---'
+call qu1.ForEach(function('Echo'))
+echo '---'
+call st1.ForEach(function('Echo'))
