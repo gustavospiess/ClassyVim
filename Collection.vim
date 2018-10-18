@@ -56,9 +56,9 @@ endfunction
 
 Class 'LinkedStructure'
     Extends Collection
-    Method 'ForEach', function('ForEach')
-    Method 'IsEmpty', function('IsEmpty')
-    Method 'Contains', function('Contains')
+    Method 'ForEach', funcref('ForEach')
+    Method 'IsEmpty', funcref('IsEmpty')
+    Method 'Contains', funcref('Contains')
     Field '_first'
 EndClass
 
@@ -89,8 +89,8 @@ endfunction
 Class 'LinkedQueue'
     Extends Queue
     Extends LinkedStructureWhitLast
-    Method 'Add', function('LQAdd')
-    Method 'Pop', function('Pop')
+    Method 'Add', funcref('LQAdd')
+    Method 'Pop', funcref('Pop')
 EndClass
 
 let qu1 = LinkedQueue.Create()
@@ -114,8 +114,8 @@ endfunction
 Class 'LinkedStack'
     Extends Stack
     Extends LinkedStructure
-    Method 'Push', function('Push')
-    Method 'Pop', function('Pop')
+    Method 'Push', funcref('Push')
+    Method 'Pop', funcref('Pop')
 EndClass
 
 let st1 = LinkedStack.Create()
@@ -167,9 +167,9 @@ endfunction
 Class 'LinkedSet'
     Extends Set
     Extends LinkedStructureWhitLast
-    Method 'Add', function('StAdd')
-    Method 'Get', function('Get')
-    Method 'Set', function('Set')
+    Method 'Add', funcref('StAdd')
+    Method 'Get', funcref('Get')
+    Method 'Set', funcref('Set')
 EndClass
 
 let st = LinkedSet.Create()
@@ -219,7 +219,7 @@ endfunction
 Class 'SortedLinkedQueue'
     Extends LinkedQueue
     Field 'comparator'
-    Method 'Add', function('SQAdd')
+    Method 'Add', funcref('SQAdd')
 EndClass
 
 function! Compare(value1, value2)
@@ -233,7 +233,7 @@ function! Compare(value1, value2)
 endfunction
 
 let sq1 = SortedLinkedQueue.Create()
-let sq1.comparator = function('Compare')
+let sq1.comparator = funcref('Compare')
 
 function! Echo(value)
     echo a:value
@@ -256,10 +256,10 @@ call sq1.Super('Add', g:LinkedQueue)(0)
 call sq1.Super('Add', g:LinkedQueue)(14)
 
 
-call sq1.ForEach(function('Echo'))
+call sq1.ForEach(funcref('Echo'))
 echo '---'
-call st.ForEach(function('Echo'))
+call st.ForEach(funcref('Echo'))
 echo '---'
-call qu1.ForEach(function('Echo'))
+call qu1.ForEach(funcref('Echo'))
 echo '---'
-call st1.ForEach(function('Echo'))
+call st1.ForEach(funcref('Echo'))

@@ -1,7 +1,7 @@
 
 "-------------------------------------------------------------------------------
 
-let g:Object = {'_methods' : {}, '_fields': [], '_name' : 'Object', 'Create': function('Create'), 'Init': function('Init')}
+let g:Object = {'_methods' : {}, '_fields': [], '_name' : 'Object', 'Create': funcref('Create'), 'Init': funcref('Init')}
 let g:Object._parents = [ g:Object ]
 
 let g:vimClass = {}
@@ -15,12 +15,23 @@ let g:vimClass.err = {}
 let g:vimClass.err.abstractMethodNotImplemented = 'Er001 - Abstract Method not implemented'
 let g:vimClass.err.underFlow = 'Er002 - Under Flow Error'
 let g:vimClass.err.overFlow = 'Er003 - Over Flow Error'
-let g:vimClass.err.incompatibleMethod = 'Er004 - incompatible method declaration'
+let g:vimClass.err.incompatibleMethod = 'Er004 - Incompatible method declaration'
+let g:vimClass.err.invalidClassName = 'Er005 - Invalid Class name'
+let g:vimClass.err.invalidMethodName = 'Er006 - Invalid Method name'
+let g:vimClass.err.SpyError = 'Er007 - Spy Error'
+let g:vimClass.err.invalidParent = 'Er008 - Invalid Parent'
+let g:vimClass.err.invalidFieldName = 'Er006 - Invalid field name'
 
 let g:vimClass.flgs = {}
 let g:vimClass.flgs.abstractMethod = 'abstract'
 
 "-------------------------------------------------------------------------------
+
+function! ValidateClassName(name)
+    if a:name !~# '\v^[A-Z]\w*$'
+        throw g:vimClass.err.invalidClassName.': '.a:name
+    endif
+endfunction
 
 function! Create(...) dict
     let obj = {}
@@ -50,6 +61,9 @@ function! Super(method, superClass) dict
 endfunction
 
 function! VGenerateClass(name)
+
+    call ValidateClassName(a:name)
+
     let clazz = {}
     let clazz._methods = {}
     let clazz._methods.Init = function('Init')
@@ -83,7 +97,17 @@ command! EndClass call VEndClass()
 "-------------------------------------------------------------------------------
 
 function! VExtends(parent)
-    call add(g:vimClass.context[-1]._parents, a:parent)
+
+    let parent = ''
+    if (type(a:parent) == 1)
+        execute 'let parent = g:'.a:parent
+    elseif (type(a:parent) == 4)
+        let parent = a:parent
+    else
+        throw g:vimClass.err.invalidParent.' on class '.g:vimClass.context[-1]._name
+    endif
+
+    call add(g:vimClass.context[-1]._parents, parent)
 
     let clazz = g:vimClass.context[-1]
 
@@ -102,8 +126,27 @@ comman! -nargs=1 Extends call VExtends(<args>)
 
 "-------------------------------------------------------------------------------
 
+function! ValidateMethodName(name)
+    if a:name !~# '\v^_?_?[A-Z]\w*$'
+        throw g:vimClass.err.invalidMethodName.' on class '.g:vimClass.context[-1]._name
+    endif
+endfunction
+
 function! VMethod(name, ...)
-    if len(a:000) == 1  && type(a:1) == 2 && type(a:name) == 1
+
+    call ValidateMethodName(a:name)
+
+    let FuncReference = 0
+    if type(a:1) == 2
+        let FuncReference = a:1
+    elseif type(a:1) == 1
+        try
+            let FuncReference = funcref(a:1)
+        catch /E700.*/
+            let FuncReference = function(a:1)
+        endtry
+    endif
+    if len(a:000) == 1  && type(FuncReference) == 2 && type(a:name) == 1
         let g:vimClass.context[-1]._methods[a:name] = a:1
     else
         throw g:vimClass.err.incompatibleMethod.' on class '.g:vimClass.context[-1]._name
@@ -116,6 +159,9 @@ command! -nargs=* Method call VMethod(<args>)
 "-------------------------------------------------------------------------------
 
 function! VAbstractMethod(name)
+
+    call ValidateMethodName(a:name)
+
     let g:vimClass.context[-1]._methods[a:name] = g:vimClass.flgs.abstractMethod
 endfunction
 
@@ -123,7 +169,16 @@ command! -nargs=1 AbstractMethod call VAbstractMethod(<args>)
 
 "-------------------------------------------------------------------------------
 
+function! ValidateFieldName(name)
+    if a:name !~# '\v^_?_?[a-z]\w*$'
+        throw g:vimClass.err.invalidFieldName.': '.a:name
+    endif
+endfunction
+
 function! VField(name)
+
+    call ValidateFieldName(a:name)
+
     call add(g:vimClass.context[-1]._fields, a:name)
 endfunction
 
