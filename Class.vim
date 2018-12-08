@@ -1,9 +1,6 @@
 
 "-------------------------------------------------------------------------------
 
-let g:Object = {'_methods' : {}, '_fields': [], '_name' : 'Object', 'Create': funcref('Create'), 'Init': funcref('Init')}
-let g:Object._parents = [ g:Object ]
-
 let g:vimClass = {}
 
 let g:vimClass.context = []
@@ -37,7 +34,7 @@ function! Create(...) dict
     let obj = {}
     for meth in keys(self._methods)
         if self._methods[meth] == g:vimClass.flgs.abstractMethod
-            throw g:vimClass.err.abstractMethodNotImplemented.' on class '.self._name
+            throw g:vimClass.err.abstractMethodNotImplemented.' on class '.self._name.' method '.meth
         endif
         let obj[meth] = self._methods[meth]
     endfor
@@ -185,4 +182,7 @@ endfunction
 command! -nargs=1 Field call VField(<args>)
 
 "-------------------------------------------------------------------------------
+
+let g:Object = {'_methods' : {}, '_fields': [], '_name' : 'Object', 'Create': funcref('Create'), 'Init': funcref('Init')}
+let g:Object._parents = [ g:Object ]
 
